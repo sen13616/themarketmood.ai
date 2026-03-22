@@ -17,3 +17,4 @@ frontend/out/
 
 # Mac
 .DS_Store
+backend/.env
