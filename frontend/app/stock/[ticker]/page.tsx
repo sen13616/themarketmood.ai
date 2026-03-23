@@ -207,27 +207,10 @@ export default async function StockPage({ params }: { params: { ticker: string }
           </div>
         </div>
 
-        {/* Chart + Gauge grid — HTML order: chart left, gauge right */}
+        {/* Chart + Gauge grid — HTML order: gauge left, chart right */}
         <div className={styles.chartGaugeGrid}>
 
-          {/* Chart pane (left on desktop, below on mobile) */}
-          <div className={styles.chartPane}>
-            {priceHistory.dates?.length > 0
-              && priceHistory.stock_prices?.length > 0
-              && priceHistory.index_prices?.length > 0 ? (
-              <PriceChart
-                ticker={ticker}
-                indexName={priceHistory.index_name}
-                dates={priceHistory.dates}
-                stockPrices={priceHistory.stock_prices}
-                indexPrices={priceHistory.index_prices}
-              />
-            ) : (
-              <div className={styles.chartEmpty}>Chart data unavailable</div>
-            )}
-          </div>
-
-          {/* Gauge pane (right on desktop, above on mobile via CSS order:-1) */}
+          {/* Gauge pane (left on desktop, above on mobile) */}
           <div className={styles.gaugePane}>
             <div className={styles.gaugePaneLabel}>Mood score</div>
             <div className={styles.gaugeScoreBlock}>
@@ -257,6 +240,23 @@ export default async function StockPage({ params }: { params: { ticker: string }
             </div>
           </div>
 
+          {/* Chart pane (right on desktop, below on mobile) */}
+          <div className={styles.chartPane}>
+            {priceHistory.dates?.length > 0
+              && priceHistory.stock_prices?.length > 0
+              && priceHistory.index_prices?.length > 0 ? (
+              <PriceChart
+                ticker={ticker}
+                indexName={priceHistory.index_name}
+                dates={priceHistory.dates}
+                stockPrices={priceHistory.stock_prices}
+                indexPrices={priceHistory.index_prices}
+              />
+            ) : (
+              <div className={styles.chartEmpty}>Chart data unavailable</div>
+            )}
+          </div>
+
         </div>
       </div>
 
@@ -275,6 +275,8 @@ export default async function StockPage({ params }: { params: { ticker: string }
           bullCase={aiIns.bull_case ?? null}
           bearCase={aiIns.bear_case ?? null}
           whatToWatch={aiIns.what_to_watch ?? null}
+          ticker={ticker}
+          signals={data}
         />
       </div>
       </FadeIn>

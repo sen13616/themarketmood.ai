@@ -123,10 +123,10 @@ Return ONLY valid JSON with no markdown, no code blocks, no explanation:
   "market_mood_label": <"Bearish"|"Somewhat Bearish"|"Leaning Bearish"|"Neutral"|"Leaning Bullish"|"Somewhat Bullish"|"Bullish">,
   "market_mood_confidence": <"low"|"medium"|"high">,
   "ai_insights": {{
-    "summary": "<2-3 sentence plain English explanation of the score>",
-    "bull_case": "<1-2 sentences on the strongest positive signals>",
-    "bear_case": "<1-2 sentences on the strongest negative signals>",
-    "what_to_watch": "<1-2 sentences on key upcoming catalysts or signals to monitor>"
+    "summary": "<4-6 sentence plain English explanation of the score, covering the key signals that drove it, the market context, and what it means for the stock>",
+    "bull_case": "<3-4 sentences on the strongest positive signals — be specific, reference actual data points from the signals provided>",
+    "bear_case": "<3-4 sentences on the strongest negative signals — be specific, reference actual data points>",
+    "what_to_watch": "<3-4 sentences on key upcoming catalysts, price levels, or signals to monitor — be specific and actionable>"
   }}
 }}"""
 
@@ -135,7 +135,7 @@ Return ONLY valid JSON with no markdown, no code blocks, no explanation:
             client  = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
             message = await client.chat.completions.create(
                 model="gpt-4o-mini",
-                max_tokens=1024,
+                max_tokens=2000,
                 messages=[{"role": "user", "content": prompt}],
             )
             raw_json   = message.choices[0].message.content.strip()

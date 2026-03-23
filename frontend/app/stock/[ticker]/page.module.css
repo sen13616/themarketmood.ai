@@ -112,20 +112,20 @@
 .ahPrice     { color: var(--green); }
 
 /* ── Chart + Gauge grid ── */
-.chartGaugeGrid { display: grid; grid-template-columns: 1fr minmax(200px, 280px); border-top: 1px solid var(--line); }
-.chartPane      { padding: 20px 24px 16px; border-right: 1px solid var(--line); min-width: 0; overflow: hidden; }
+.chartGaugeGrid { display: grid; grid-template-columns: 1fr 2fr; border-top: 1px solid var(--line); }
+.chartPane      { padding: 20px 24px 16px; min-width: 0; overflow: hidden; }
 .chartEmpty     { display: flex; align-items: center; justify-content: center; height: 200px; font-family: var(--mono); font-size: 12px; color: var(--tx3); }
 
 /* ── Gauge pane ── */
-.gaugePane      { padding: 28px 28px 24px; display: flex; flex-direction: column; justify-content: center; gap: 20px; }
+.gaugePane      { padding: 28px 28px 24px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px; border-right: 1px solid var(--line); }
 .gaugePaneLabel { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--tx3); }
-.gaugeScoreBlock { }
-.gaugeScore     { font-family: var(--serif); font-size: 64px; letter-spacing: -3px; line-height: 1; color: var(--tx1); margin-bottom: 4px; }
+.gaugeScoreBlock { text-align: center; }
+.gaugeScore     { font-family: var(--serif); font-size: 80px; letter-spacing: -4px; line-height: 1; color: var(--tx1); margin-bottom: 4px; }
 .gaugeWord      { font-family: var(--mono); font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 3px; }
 .gaugeConf      { font-family: var(--mono); font-size: 11px; color: var(--tx3); }
 
 /* ── Spectrum ── */
-.gaugeSpectrum { width: 100%; margin-top: 16px; }
+.gaugeSpectrum { width: 100%; max-width: 240px; margin-top: 16px; }
 .specTrack  { height: 5px; background: linear-gradient(to right, var(--red) 0%, var(--amber) 50%, var(--green) 100%); border-radius: 3px; position: relative; margin-bottom: 8px; }
 .specThumb  { width: 12px; height: 12px; background: var(--tx1); border-radius: 50%; position: absolute; top: -3.5px; transform: translateX(-50%); border: 2px solid var(--bg); }
 .specLabels { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 9px; color: var(--tx3); text-transform: uppercase; letter-spacing: 0.5px; }
@@ -185,7 +185,7 @@
 .insightTab:hover:not(.insightTabActive) { color: var(--tx2); }
 
 .insightBody { padding: 24px 24px 28px; }
-.insightText { font-size: 15px; font-weight: 300; color: var(--tx2); line-height: 1.75; letter-spacing: -0.1px; max-width: 760px; }
+.insightText { font-size: 15px; font-weight: 300; color: var(--tx2); line-height: 1.75; letter-spacing: -0.1px; }
 .insightText strong { color: var(--tx1); font-weight: 500; }
 
 /* ═══════════════════════════════════════════
@@ -512,8 +512,8 @@
 
 /* Tablet — shrink gauge column */
 @media (max-width: 860px) {
-  .chartGaugeGrid { grid-template-columns: 1fr minmax(180px, 220px); }
-  .gaugeScore     { font-size: 48px; }
+  .chartGaugeGrid { grid-template-columns: 1fr 2fr; }
+  .gaugeScore     { font-size: 64px; }
   .gaugePane      { padding: 16px; }
 }
 
@@ -539,9 +539,8 @@
   /* Collapse grid → flex column */
   .chartGaugeGrid { display: flex; flex-direction: column; }
 
-  /* Gauge above chart — CSS order, HTML stays the same */
+  /* Gauge on top — naturally first in HTML */
   .gaugePane {
-    order: -1;
     border-bottom: 1px solid var(--line);
     border-right: none;
     padding: 16px;
@@ -550,7 +549,7 @@
     gap: 16px;
   }
   .gaugeScoreBlock { flex-shrink: 0; }
-  .gaugeScore      { font-size: 40px; }
+  .gaugeScore      { font-size: 48px; }
   .gaugeWord       { font-size: 11px; }
   .gaugeConf       { font-size: 10px; }
   .gaugeSpectrum   { flex: 1; min-width: 0; margin-top: 0; }

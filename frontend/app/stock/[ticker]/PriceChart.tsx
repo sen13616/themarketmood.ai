@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import styles from './page.module.css';
 
 interface PriceChartProps {
@@ -14,6 +14,13 @@ interface PriceChartProps {
 const PERIODS = ['1M', '3M', '6M', '1Y'] as const;
 type Period = typeof PERIODS[number];
 
+const PERIOD_LABEL: Record<Period, string> = {
+  '1M': '1 month',
+  '3M': '3 months',
+  '6M': '6 months',
+  '1Y': '1 year',
+};
+
 function calcReturn(prices: number[]): number | null {
   if (prices.length < 2 || prices[0] === 0) return null;
   return ((prices[prices.length - 1] - prices[0]) / prices[0]) * 100;
@@ -24,26 +31,9 @@ function fmtRet(r: number | null): string {
   return (r >= 0 ? '+' : '') + r.toFixed(1) + '%';
 }
 
-export default function PriceChart({
-  ticker,
-  indexName,
-  dates,
-  stockPrices,
-  indexPrices,
-}: PriceChartProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const chartRef  = useRef<any>(null);
-  const [activePeriod, setActivePeriod] = useState<Period>('3M');
-  const [showIndex, setShowIndex] = useState(true);
-
-  const stockReturn = calcReturn(stockPrices);
-  const indexReturn = calcReturn(indexPrices);
-  const diff = stockReturn != null && indexReturn != null
-    ? stockReturn - indexReturn
-    : null;
-
+function buildSparseLabels(dates: string[]): string[] {
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const sparseLabels = dates.map((d, i) => {
+  return dates.map((d, i) => {
     const step = Math.max(1, Math.floor(dates.length / 7));
     if (i % step === 0 || i === dates.length - 1) {
       const p = d.split('-');
@@ -53,11 +43,44 @@ export default function PriceChart({
     }
     return '';
   });
+}
 
+export default function PriceChart({
+  ticker,
+  indexName,
+  dates: initialDates,
+  stockPrices: initialStockPrices,
+  indexPrices: initialIndexPrices,
+}: PriceChartProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const chartRef  = useRef<any>(null);
+
+  const [activePeriod, setActivePeriod] = useState<Period>('3M');
+  const [showIndex, setShowIndex] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  // Current chart data (starts with server-side 3M data)
+  const [chartData, setChartData] = useState({
+    dates: initialDates,
+    stockPrices: initialStockPrices,
+    indexPrices: initialIndexPrices,
+  });
+
+  const stockReturn = calcReturn(chartData.stockPrices);
+  const indexReturn = calcReturn(chartData.indexPrices);
+  const diff = stockReturn != null && indexReturn != null
+    ? stockReturn - indexReturn
+    : null;
+
+  // Build/rebuild chart when chartData changes
   useEffect(() => {
     if (!canvasRef.current) return;
     let destroyed = false;
     let resizeObserver: ResizeObserver | null = null;
+
+    const { dates, stockPrices, indexPrices } = chartData;
+    const sparseLabels = buildSparseLabels(dates);
+    const isUp = (calcReturn(stockPrices) ?? 0) >= 0;
 
     (async () => {
       const { Chart } = await import('chart.js/auto');
@@ -67,8 +90,6 @@ export default function PriceChart({
 
       const ctx = canvasRef.current.getContext('2d');
       if (!ctx) return;
-
-      const isUp = (stockReturn ?? 0) >= 0;
 
       chartRef.current = new Chart(ctx, {
         type: 'line',
@@ -101,7 +122,7 @@ export default function PriceChart({
               tension: 0.3,
               fill: false,
               yAxisID: 'yIndex',
-              hidden: false,
+              hidden: !showIndex,
             },
           ],
         },
@@ -155,7 +176,6 @@ export default function PriceChart({
         },
       });
 
-      // Force chart to follow container size on every resize
       if (canvasRef.current?.parentElement) {
         resizeObserver = new ResizeObserver(() => {
           if (chartRef.current) chartRef.current.resize();
@@ -170,7 +190,40 @@ export default function PriceChart({
       if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ticker, dates, stockPrices, indexPrices]);
+  }, [ticker, chartData]);
+
+  const handlePeriodChange = useCallback(async (period: Period) => {
+    if (period === activePeriod) return;
+    setActivePeriod(period);
+
+    // 3M data is already loaded from the server
+    if (period === '3M') {
+      setChartData({
+        dates: initialDates,
+        stockPrices: initialStockPrices,
+        indexPrices: initialIndexPrices,
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/price-history/${ticker}?period=${period}`
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setChartData({
+        dates: data.dates ?? [],
+        stockPrices: data.stock_prices ?? [],
+        indexPrices: data.index_prices ?? [],
+      });
+    } catch {
+      // Keep existing data on error
+    } finally {
+      setLoading(false);
+    }
+  }, [activePeriod, ticker, initialDates, initialStockPrices, initialIndexPrices]);
 
   const toggleIndex = () => {
     if (!chartRef.current) return;
@@ -190,7 +243,8 @@ export default function PriceChart({
             <button
               key={p}
               className={`${styles.rangeTab} ${activePeriod === p ? styles.rangeTabActive : ''}`}
-              onClick={() => { if (p === '3M') setActivePeriod(p); }}
+              onClick={() => handlePeriodChange(p)}
+              disabled={loading}
             >
               {p}
             </button>
@@ -226,8 +280,11 @@ export default function PriceChart({
         )}
       </div>
 
-      {/* Canvas — height via CSS only; max-width+min-width force shrink on resize */}
-      <div className={styles.chartCanvasWrap} style={{ overflow: 'hidden', maxWidth: '100%', minWidth: 0 }}>
+      {/* Canvas */}
+      <div
+        className={styles.chartCanvasWrap}
+        style={{ overflow: 'hidden', maxWidth: '100%', minWidth: 0, opacity: loading ? 0.4 : 1, transition: 'opacity 0.2s' }}
+      >
         <canvas ref={canvasRef} style={{ width: '100%', maxWidth: '100%' }} />
       </div>
 
@@ -249,7 +306,7 @@ export default function PriceChart({
             </span>
           </div>
         </div>
-        <div className={styles.chartFooterMeta}>daily close · 3 months</div>
+        <div className={styles.chartFooterMeta}>daily close · {PERIOD_LABEL[activePeriod]}</div>
       </div>
     </div>
   );
