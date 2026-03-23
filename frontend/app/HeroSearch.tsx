@@ -66,13 +66,33 @@ export default function HeroSearch() {
     return () => clearTimeout(timerRef.current);
   }, [query]);
 
-  function navigate(result: SearchResult | string) {
+  function navigate(result: SearchResult) {
     setOpen(false);
     setQuery('');
-    if (typeof result === 'string') {
-      router.push(`/stock/${result.toUpperCase()}`);
-    } else {
-      router.push(getAssetUrl(result));
+    router.push(getAssetUrl(result));
+  }
+
+  async function navigateToTicker(input: string) {
+    const ticker = input.trim().toUpperCase();
+    if (!ticker) return;
+    setOpen(false);
+    setQuery('');
+    try {
+      const res = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(ticker)}`);
+      const data = await res.json();
+      const exact = data.results?.find(
+        (r: any) => r.ticker.toUpperCase() === ticker || (r.display_ticker ?? '').toUpperCase() === ticker
+      );
+      if (exact) {
+        router.push(`/${exact.asset_type}/${encodeURIComponent(exact.ticker)}`);
+      } else if (data.results?.length > 0) {
+        const first = data.results[0];
+        router.push(`/${first.asset_type}/${encodeURIComponent(first.ticker)}`);
+      } else {
+        router.push(`/stock/${ticker}`);
+      }
+    } catch {
+      router.push(`/stock/${ticker}`);
     }
   }
 
@@ -83,7 +103,7 @@ export default function HeroSearch() {
       return;
     }
     if (!open || results.length === 0) {
-      if (e.key === 'Enter' && query.trim()) navigate(query.trim());
+      if (e.key === 'Enter' && query.trim()) navigateToTicker(query.trim());
       return;
     }
     if (e.key === 'ArrowDown') {
@@ -96,7 +116,7 @@ export default function HeroSearch() {
       if (focusIdx >= 0 && results[focusIdx]) {
         navigate(results[focusIdx]);
       } else if (query.trim()) {
-        navigate(query.trim());
+        navigateToTicker(query.trim());
       }
     }
   }
@@ -105,7 +125,7 @@ export default function HeroSearch() {
     if (focusIdx >= 0 && results[focusIdx]) {
       navigate(results[focusIdx]);
     } else if (query.trim()) {
-      navigate(query.trim());
+      navigateToTicker(query.trim());
     }
   }
 

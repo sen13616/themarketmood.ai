@@ -223,11 +223,14 @@ export default async function AssetPage({ ticker: tickerParam, assetTypeHint }: 
           </div>
           <div className={styles.stockPriceRow}>
             <div className={styles.stockPrice}>
-              <CountUp
-                value={price.current_price}
-                prefix={isForex ? '' : '$'}
-                decimals={isForex ? (assetMeta.price_decimals ?? 4) : 2}
-              />
+              {price.current_price && price.current_price !== 0
+                ? <CountUp
+                    value={price.current_price}
+                    prefix={isForex ? '' : '$'}
+                    decimals={isForex ? (assetMeta.price_decimals ?? 4) : 2}
+                  />
+                : <span style={{ fontFamily: 'var(--mono)', fontSize: 32, color: 'var(--tx3)' }}>—</span>
+              }
             </div>
             <div className={styles.stockChangeBlock}>
               <div className={styles.stockChange}>
@@ -416,7 +419,7 @@ export default async function AssetPage({ ticker: tickerParam, assetTypeHint }: 
               : volRatio > 2 ? 'var(--red)'
               : volRatio > 1.3 ? 'var(--amber)'
               : 'var(--green)';
-            const volTag = volRatio == null ? 'N/A'
+            const volTag = volRatio == null ? '—'
               : volRatio > 2 ? 'Very High'
               : volRatio > 1.3 ? 'Elevated'
               : 'Normal';

@@ -113,25 +113,47 @@ async def get_yfinance_data(ticker: str) -> dict:
         asset_info = detect_asset_type(info)
 
         # ── price_data ────────────────────────────────────────────────────────
-        current_price   = info.get("currentPrice")
-        previous_close  = info.get("previousClose")
-        day_low         = info.get("dayLow")
-        day_high        = info.get("dayHigh")
-        ftw_low         = info.get("fiftyTwoWeekLow")
-        ftw_high        = info.get("fiftyTwoWeekHigh")
+        current_price = (
+            info.get('regularMarketPrice') or
+            info.get('currentPrice') or
+            info.get('previousClose') or
+            info.get('ask') or
+            info.get('bid') or
+            None
+        )
+        previous_close = info.get('previousClose') or info.get('regularMarketPreviousClose')
+        day_low        = info.get('regularMarketDayLow')  or info.get('dayLow')
+        day_high       = info.get('regularMarketDayHigh') or info.get('dayHigh')
+        ftw_low        = info.get('fiftyTwoWeekLow')  or info.get('52WeekLow')
+        ftw_high       = info.get('fiftyTwoWeekHigh') or info.get('52WeekHigh')
+
+        raw_change = info.get('regularMarketChange')
+        if raw_change is None:
+            raw_change = _safe_sub(current_price, previous_close)
+
+        raw_change_pct = info.get('regularMarketChangePercent')
+        if raw_change_pct is None:
+            raw_change_pct = _safe_pct(raw_change, previous_close)
+
+        volume = info.get('regularMarketVolume') or info.get('volume')
+        average_volume = (
+            info.get('averageVolume') or
+            info.get('averageDailyVolume3Month') or
+            info.get('averageDailyVolume10Day')
+        )
 
         price_data = {
             "current_price":              current_price,
-            "open":                        info.get("open"),
+            "open":                        info.get('regularMarketOpen') or info.get('open'),
             "high":                        day_high,
             "low":                         day_low,
             "previous_close":              previous_close,
-            "change":                      _safe_sub(current_price, previous_close),
-            "change_percent":              info.get("regularMarketChangePercent"),
-            "volume":                      info.get("volume"),
-            "average_volume":              info.get("averageVolume"),
+            "change":                      raw_change,
+            "change_percent":              raw_change_pct,
+            "volume":                      volume,
+            "average_volume":              average_volume,
             "pre_market_price":            info.get("preMarketPrice"),
-            "post_market_price":           info.get("postMarketPrice"),
+            "post_market_price":           info.get("postMarketPrice") or None,
             "post_market_change_percent":  info.get("postMarketChangePercent"),
             "week_52_high":                ftw_high,
             "week_52_low":                 ftw_low,
