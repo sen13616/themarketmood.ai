@@ -4,6 +4,6 @@ export function generateMetadata({ params }: { params: { ticker: string } }) {
   return { title: `${params.ticker.toUpperCase()} — TheMarketMood.ai` };
 }
 
-export default function StockPage({ params }: { params: { ticker: string } }) {
-  return <AssetPage ticker={params.ticker} assetTypeHint="stock" />;
+export default function CommodityPage({ params }: { params: { ticker: string } }) {
+  return <AssetPage ticker={params.ticker} assetTypeHint="commodity" />;
 }

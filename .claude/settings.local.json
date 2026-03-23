@@ -26,7 +26,8 @@
       "Bash(open:*)",
       "Bash(curl:*)",
       "mcp__ide__getDiagnostics",
-      "Bash(ls \"/Users/aayudhyindahoodie/Documents/Primary/My Projects/TheMarketMood.ai/\"*.html)"
+      "Bash(ls \"/Users/aayudhyindahoodie/Documents/Primary/My Projects/TheMarketMood.ai/\"*.html)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

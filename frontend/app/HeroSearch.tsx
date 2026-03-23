@@ -7,9 +7,16 @@ import styles from './page.module.css';
 
 interface SearchResult {
   ticker: string;
+  display_ticker?: string;
   name: string;
   type?: string;
+  asset_type?: string;
   exchange?: string;
+}
+
+function getAssetUrl(result: SearchResult): string {
+  const assetType = result.asset_type || 'stock';
+  return `/${assetType}/${encodeURIComponent(result.ticker)}`;
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -59,10 +66,14 @@ export default function HeroSearch() {
     return () => clearTimeout(timerRef.current);
   }, [query]);
 
-  function navigate(ticker: string) {
+  function navigate(result: SearchResult | string) {
     setOpen(false);
     setQuery('');
-    router.push(`/stock/${ticker.toUpperCase()}`);
+    if (typeof result === 'string') {
+      router.push(`/stock/${result.toUpperCase()}`);
+    } else {
+      router.push(getAssetUrl(result));
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -83,7 +94,7 @@ export default function HeroSearch() {
       setFocusIdx(i => Math.max(i - 1, -1));
     } else if (e.key === 'Enter') {
       if (focusIdx >= 0 && results[focusIdx]) {
-        navigate(results[focusIdx].ticker);
+        navigate(results[focusIdx]);
       } else if (query.trim()) {
         navigate(query.trim());
       }
@@ -92,7 +103,7 @@ export default function HeroSearch() {
 
   function handleGo() {
     if (focusIdx >= 0 && results[focusIdx]) {
-      navigate(results[focusIdx].ticker);
+      navigate(results[focusIdx]);
     } else if (query.trim()) {
       navigate(query.trim());
     }
@@ -126,11 +137,11 @@ export default function HeroSearch() {
             <div
               key={r.ticker}
               className={`${styles.dropdownItem}${i === focusIdx ? ' ' + styles.dropdownFocused : ''}`}
-              onMouseDown={() => navigate(r.ticker)}
+              onMouseDown={() => navigate(r)}
               onMouseEnter={() => setFocusIdx(i)}
             >
               <div className={styles.diLeft}>
-                <span className={styles.diTicker}>{r.ticker}</span>
+                <span className={styles.diTicker}>{r.display_ticker || r.ticker}</span>
                 <span className={styles.diName}>{r.name}</span>
               </div>
               {r.type && (

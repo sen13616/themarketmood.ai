@@ -9,6 +9,7 @@ interface PriceChartProps {
   dates: string[];
   stockPrices: number[];
   indexPrices: number[];
+  showIndexComparison?: boolean;
 }
 
 const PERIODS = ['1M', '3M', '6M', '1Y'] as const;
@@ -51,6 +52,7 @@ export default function PriceChart({
   dates: initialDates,
   stockPrices: initialStockPrices,
   indexPrices: initialIndexPrices,
+  showIndexComparison = true,
 }: PriceChartProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef  = useRef<any>(null);
@@ -122,7 +124,7 @@ export default function PriceChart({
               tension: 0.3,
               fill: false,
               yAxisID: 'yIndex',
-              hidden: !showIndex,
+              hidden: !showIndex || !showIndexComparison,
             },
           ],
         },
@@ -168,6 +170,7 @@ export default function PriceChart({
             },
             yIndex: {
               position: 'right',
+              display: showIndexComparison,
               grid:   { display: false },
               ticks:  { color: '#4a5568', font: { size: 10, family: 'Geist Mono, monospace' }, callback: (v: any) => Number(v).toLocaleString('en-US', { maximumFractionDigits: 0 }) },
               border: { display: false },
@@ -258,15 +261,17 @@ export default function PriceChart({
           <div className={styles.legendChipDot} style={{ background: 'var(--tx1)' }} />
           {ticker}
         </div>
-        <div
-          className={styles.legendChip}
-          style={{ opacity: showIndex ? 1 : 0.4, cursor: 'pointer' }}
-          onClick={toggleIndex}
-        >
-          <div className={styles.legendChipDashed} />
-          vs {indexName} {showIndex ? '✓' : ''}
-        </div>
-        {showIndex && diff != null && (
+        {showIndexComparison && (
+          <div
+            className={styles.legendChip}
+            style={{ opacity: showIndex ? 1 : 0.4, cursor: 'pointer' }}
+            onClick={toggleIndex}
+          >
+            <div className={styles.legendChipDashed} />
+            vs {indexName} {showIndex ? '✓' : ''}
+          </div>
+        )}
+        {showIndexComparison && showIndex && diff != null && (
           <div
             className={styles.vsChip}
             style={{
@@ -298,13 +303,15 @@ export default function PriceChart({
               {fmtRet(stockReturn)}
             </span>
           </div>
-          <div className={styles.cflItem}>
-            <div className={`${styles.cflLine} ${styles.cflDashed}`} />
-            <span>{indexName}</span>
-            <span className={(indexReturn ?? 0) >= 0 ? styles.pos : styles.neg}>
-              {fmtRet(indexReturn)}
-            </span>
-          </div>
+          {showIndexComparison && (
+            <div className={styles.cflItem}>
+              <div className={`${styles.cflLine} ${styles.cflDashed}`} />
+              <span>{indexName}</span>
+              <span className={(indexReturn ?? 0) >= 0 ? styles.pos : styles.neg}>
+                {fmtRet(indexReturn)}
+              </span>
+            </div>
+          )}
         </div>
         <div className={styles.chartFooterMeta}>daily close · {PERIOD_LABEL[activePeriod]}</div>
       </div>
