@@ -110,6 +110,7 @@ export default function PriceChart({
           maintainAspectRatio: false,
           resizeDelay: 0,
           layout: { autoPadding: false },
+          animation: { duration: 800, easing: 'easeInOutQuart' },
           interaction: { mode: 'index', intersect: false },
           plugins: {
             legend: { display: false },

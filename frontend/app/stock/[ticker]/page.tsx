@@ -4,6 +4,8 @@ import Link from 'next/link';
 import NavSearch from './NavSearch';
 import InsightTabs from './InsightTabs';
 import PriceChart from './PriceChart';
+import FadeIn from '@/app/FadeIn';
+import CountUp from './CountUp';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -177,7 +179,7 @@ export default async function StockPage({ params }: { params: { ticker: string }
           </div>
           <div className={styles.stockPriceRow}>
             <div className={styles.stockPrice}>
-              {price.current_price != null ? `$${price.current_price.toFixed(2)}` : '—'}
+              <CountUp value={price.current_price} prefix="$" decimals={2} />
             </div>
             <div className={styles.stockChangeBlock}>
               <div className={styles.stockChange}>
@@ -229,7 +231,9 @@ export default async function StockPage({ params }: { params: { ticker: string }
           <div className={styles.gaugePane}>
             <div className={styles.gaugePaneLabel}>Mood score</div>
             <div className={styles.gaugeScoreBlock}>
-              <div className={styles.gaugeScore}>{score}</div>
+              <div className={styles.gaugeScore}>
+                <CountUp value={score} prefix="" decimals={0} />
+              </div>
               <div className={styles.gaugeWord} style={{ color: scoreCol }}>
                 {data.market_mood_label ?? 'Neutral'}
               </div>
@@ -257,6 +261,7 @@ export default async function StockPage({ params }: { params: { ticker: string }
       </div>
 
       {/* ── 3. AI INSIGHTS ─────────────────────────────────────── */}
+      <FadeIn>
       <div className={styles.aiCard}>
         <div className={styles.aiHeader}>
           <div className={styles.aiHeaderLeft}>
@@ -272,8 +277,10 @@ export default async function StockPage({ params }: { params: { ticker: string }
           whatToWatch={aiIns.what_to_watch ?? null}
         />
       </div>
+      </FadeIn>
 
       {/* ── 4. SIGNAL BREAKDOWN ─────────────────────────────────── */}
+      <FadeIn delay={60}>
       <div className={`${styles.section} ${styles.signalGridSection}`}>
         <div className={styles.secLabel}>Signal breakdown</div>
         <div className={styles.pillarsWrap}>
@@ -1320,8 +1327,10 @@ export default async function StockPage({ params }: { params: { ticker: string }
 
         </div>
       </div>
+      </FadeIn>
 
       {/* ── 5. NEWS ────────────────────────────────────────────── */}
+      <FadeIn delay={60}>
       <div className={styles.section}>
         <div className={styles.secLabel}>Recent news</div>
         <div className={styles.newsList}>
@@ -1351,8 +1360,10 @@ export default async function StockPage({ params }: { params: { ticker: string }
           )}
         </div>
       </div>
+      </FadeIn>
 
       {/* ── 6. FUNDAMENTALS ────────────────────────────────────── */}
+      <FadeIn delay={60}>
       <div className={styles.section}>
         <div className={styles.secLabel}>Fundamentals</div>
         <div className={styles.fundGrid}>
@@ -1428,8 +1439,10 @@ export default async function StockPage({ params }: { params: { ticker: string }
           </div>
         </div>
       </div>
+      </FadeIn>
 
       {/* ── 7. ANALYST VIEW ────────────────────────────────────── */}
+      <FadeIn delay={60}>
       <div className={styles.section}>
         <div className={styles.secLabel}>Analyst view</div>
         <div className={styles.analystGrid}>
@@ -1494,8 +1507,10 @@ export default async function StockPage({ params }: { params: { ticker: string }
 
         </div>
       </div>
+      </FadeIn>
 
       {/* ── 8. INSTITUTIONAL ───────────────────────────────────── */}
+      <FadeIn delay={60}>
       <div className={styles.section}>
         <div className={styles.secLabel}>Institutional &amp; insider activity</div>
 
@@ -1559,6 +1574,7 @@ export default async function StockPage({ params }: { params: { ticker: string }
           </div>
         )}
       </div>
+      </FadeIn>
 
       {/* ── 9. FOOTER ──────────────────────────────────────────── */}
       <footer className={styles.footer}>

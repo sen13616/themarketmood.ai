@@ -2,6 +2,7 @@ import { getHomeData } from '@/lib/api';
 import styles from './page.module.css';
 import Link from 'next/link';
 import HeroSearch from './HeroSearch';
+import FadeIn from './FadeIn';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -96,20 +97,20 @@ export default async function HomePage() {
 
         {/* ── 2. HERO ──────────────────────────────────────────────── */}
         <section className={styles.hero}>
-          <div className={styles.heroEyebrow}>
+          <div className={`${styles.heroEyebrow} ${styles.heroFade0}`}>
             <span className={styles.pip} />
             Real-time market intelligence
           </div>
-          <h1>
+          <h1 className={styles.heroFade1}>
             The market has<br />
             a <em>mood.</em><br />
             We read it.
           </h1>
-          <p className={styles.heroSub}>
+          <p className={`${styles.heroSub} ${styles.heroFade2}`}>
             Search any stock for an instant sentiment read — technical signals, crowd behaviour, and AI narrative in one place.
           </p>
-          <HeroSearch />
-          <div className={styles.hints}>
+          <div className={styles.heroFade3}><HeroSearch /></div>
+          <div className={`${styles.hints} ${styles.heroFade4}`}>
             <span className={styles.hintLabel}>Try</span>
             {['NVDA', 'TSLA', 'AAPL', 'META', 'AMD'].map(t => (
               <Link key={t} href={`/stock/${t}`} className={styles.hintChip}>{t}</Link>
@@ -118,6 +119,7 @@ export default async function HomePage() {
         </section>
 
         {/* ── 3. MARKET INDICES ────────────────────────────────────── */}
+        <FadeIn>
         <div className={styles.section}>
           <div className={styles.secLabel}>
             <span className={styles.livePip} />
@@ -154,8 +156,10 @@ export default async function HomePage() {
             })}
           </div>
         </div>
+        </FadeIn>
 
         {/* ── 4. FEAR & GREED ──────────────────────────────────────── */}
+        <FadeIn delay={60}>
         <div className={styles.fgDashboard}>
 
           {/* Left: main score */}
@@ -221,8 +225,10 @@ export default async function HomePage() {
             })}
           </div>
         </div>
+        </FadeIn>
 
         {/* ── 5. TRENDING ON REDDIT ────────────────────────────────── */}
+        <FadeIn delay={60}>
         <div className={styles.section}>
           <div className={styles.secLabel}>Trending on Reddit · ApeWisdom</div>
           <div className={styles.redditTable}>
@@ -261,8 +267,10 @@ export default async function HomePage() {
             })}
           </div>
         </div>
+        </FadeIn>
 
         {/* ── 6. MARKET HEADLINES ──────────────────────────────────── */}
+        <FadeIn delay={60}>
         <div className={`${styles.section} ${styles.sectionNoBorder}`}>
           <div className={styles.secLabel}>Market headlines</div>
           <div className={styles.newsGrid}>
@@ -286,6 +294,7 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
+        </FadeIn>
 
         {/* ── 7. FOOTER ────────────────────────────────────────────── */}
         <footer className={styles.footer}>

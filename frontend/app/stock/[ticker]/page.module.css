@@ -8,7 +8,10 @@
   letter-spacing: 1.4px; color: var(--tx3); margin-bottom: 20px;
   display: flex; align-items: center; gap: 10px;
 }
-.secLabel::after { content: ''; flex: 1; height: 1px; background: var(--line-soft); }
+.secLabel::after {
+  content: ''; flex: 1; height: 1px; background: var(--line-soft);
+  transform-origin: left; animation: lineExtend 0.6s ease 0.3s both;
+}
 
 .tag {
   display: inline-flex; align-items: center; justify-content: center;
@@ -33,10 +36,10 @@
 .groupRow {
   display: grid; align-items: center; gap: 16px;
   padding: 12px 20px; border-bottom: 1px solid var(--line-soft);
-  transition: background .12s;
+  transition: background .12s, transform .15s;
 }
 .groupRow:last-child { border-bottom: none; }
-.groupRow:hover { background: var(--surface); }
+.groupRow:hover { background: var(--surface); transform: translateX(2px); }
 .row3 { grid-template-columns: 1fr auto auto; }
 .row2 { grid-template-columns: 1fr auto; }
 .rowName { font-size: 13px; color: var(--tx2); }
@@ -74,9 +77,10 @@
   background: var(--tx1); color: var(--bg); flex-shrink: 0;
   border: none; border-radius: 6px;
   padding: 6px 16px; font-size: 13px; font-weight: 500;
-  font-family: var(--sans); cursor: pointer; transition: opacity .15s;
+  font-family: var(--sans); cursor: pointer; transition: opacity .15s, transform .1s;
 }
 .btnPro:hover { opacity: .86; }
+.btnPro:active { transform: scale(0.97); }
 
 /* ═══════════════════════════════════════════
    2. TOP SECTION — stock header + chart + gauge
@@ -170,7 +174,7 @@
 @keyframes pip { 0%,100%{opacity:1} 50%{opacity:.3} }
 .aiHeaderLabel { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--tx2); }
 
-.insightTabs { display: flex; border-bottom: 1px solid var(--line); padding: 0 22px; overflow-x: auto; }
+.insightTabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding: 0 22px; overflow-x: visible; }
 .insightTab {
   font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
   padding: 12px 16px; color: var(--tx3); cursor: pointer; transition: all .15s;
@@ -380,11 +384,11 @@
   display: grid; grid-template-columns: 1fr auto;
   align-items: center; gap: 16px;
   padding: 13px 20px; border-bottom: 1px solid var(--line-soft);
-  cursor: pointer; transition: background .12s; text-decoration: none;
+  cursor: pointer; transition: background .12s, transform .15s; text-decoration: none;
   color: inherit;
 }
 .newsRow:last-child { border-bottom: none; }
-.newsRow:hover { background: var(--surface); }
+.newsRow:hover { background: var(--surface); transform: translateX(2px); }
 .newsTitle { font-size: 13px; color: var(--tx1); line-height: 1.4; margin-bottom: 4px; }
 .newsMeta  { font-family: var(--mono); font-size: 11px; color: var(--tx3); }
 .newsMeta span { margin-right: 10px; }
@@ -443,10 +447,10 @@
   display: grid; grid-template-columns: 1fr 1fr 1fr 80px;
   gap: 12px; padding: 12px 20px;
   border-bottom: 1px solid var(--line-soft);
-  transition: background .12s;
+  transition: background .12s, transform .15s;
 }
 .etRow:last-child { border-bottom: none; }
-.etRow:hover { background: var(--surface); }
+.etRow:hover { background: var(--surface); transform: translateX(2px); }
 .etRow span { font-family: var(--mono); font-size: 12px; color: var(--tx2); }
 .etTx1 { color: var(--tx1) !important; }
 .etPos { color: var(--green) !important; }
@@ -477,10 +481,10 @@
   display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 12px; padding: 12px 20px;
   border-bottom: 1px solid var(--line-soft);
-  transition: background .12s;
+  transition: background .12s, transform .15s;
 }
 .htRow:last-child { border-bottom: none; }
-.htRow:hover { background: var(--surface); }
+.htRow:hover { background: var(--surface); transform: translateX(2px); }
 .htRow span { font-family: var(--mono); font-size: 12px; color: var(--tx2); }
 .htTx1 { color: var(--tx1) !important; }
 .htPos { color: var(--green) !important; }
@@ -562,7 +566,7 @@
   .chartFooterMeta { width: 100%; }
 
   /* AI insights */
-  .insightTabs { overflow-x: auto; padding: 0 14px; }
+  .insightTabs { overflow-x: visible; padding: 0 14px; }
   .insightTab  { white-space: nowrap; padding: 10px 12px; font-size: 10px; }
   .insightBody { padding: 16px; }
   .insightText { font-size: 14px; }
@@ -572,4 +576,12 @@
   .stockTicker { font-size: 28px; }
   .stockPrice  { font-size: 26px; }
   .gaugeScore  { font-size: 34px; }
+}
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════ */
+@keyframes lineExtend {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
 }
