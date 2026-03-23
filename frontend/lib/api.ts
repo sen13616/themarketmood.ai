@@ -29,3 +29,11 @@ export async function searchTickers(query: string) {
   if (!res.ok) throw new Error('Failed to search tickers');
   return res.json();
 }
+
+export async function getMood() {
+  const res = await fetch(`${API_URL}/api/mood`, {
+    next: { revalidate: 900 },
+  });
+  if (!res.ok) throw new Error('Failed to fetch mood');
+  return res.json();
+}

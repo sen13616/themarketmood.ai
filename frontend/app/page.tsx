@@ -3,6 +3,7 @@ import styles from './page.module.css';
 import Link from 'next/link';
 import HeroSearch from './HeroSearch';
 import FadeIn from './FadeIn';
+import MoodCard from './MoodCard';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -118,7 +119,12 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* ── 3. MARKET INDICES ────────────────────────────────────── */}
+        {/* ── 3. MARKET MOOD ───────────────────────────────────────── */}
+        <FadeIn delay={40}>
+          <MoodCard />
+        </FadeIn>
+
+        {/* ── 4. MARKET INDICES ────────────────────────────────────── */}
         <FadeIn>
         <div className={styles.section}>
           <div className={styles.secLabel}>
