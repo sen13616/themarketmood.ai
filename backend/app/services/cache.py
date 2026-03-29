@@ -21,7 +21,6 @@ def _get_client() -> aioredis.Redis:
         _client = aioredis.from_url(settings.REDIS_URL, decode_responses=True)
     return _client
 
-
 async def get_cached(key: str) -> Optional[dict]:
     """Return the cached dict for *key*, or None if missing / Redis is down."""
     try:
